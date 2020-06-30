@@ -561,6 +561,46 @@ Tried calling: noMethod()
 #5      _RawReceivePortImpl._handleMessage (dart:isolate-patch/isolate_patch.dart:151)
 END
 
+  CPP_ABSEIL_FATAL_ERR = <<END.freeze
+*** Check failure stack trace: ***
+    @     0x55f9a197a41b  base/logging.cc:994 absl::logging_internal::LogMessage::DieIfFatal()
+    @     0x55f9a1979896  base/logging.cc:1083 absl::logging_internal::LogMessage::SendToLog()
+    @     0x55f9a197937c  base/logging.cc:818 absl::logging_internal::LogMessage::Flush()
+    @     0x55f9a197b069  base/logging.cc:1351 absl::logging_internal::LogMessageFatal::~LogMessageFatal()
+    @     0x55f9a192ec34  cpp_stack_trace/cpp_stack_trace.cc:13 main
+    @     0x7fb20b502bbd  __libc_start_main
+    @     0x55f9a192eaa9  ../sysdeps/x86_64/start.S:108 _start
+END
+
+  CPP_ABSEIL_FATAL_ERR_NO_FILE_LINE = <<END.freeze
+*** Check failure stack trace: ***
+    @     0x55fd46baf11b  absl::logging_internal::LogMessage::DieIfFatal()
+    @     0x55fd46bae596  absl::logging_internal::LogMessage::SendToLog()
+    @     0x55fd46bae07c  absl::logging_internal::LogMessage::Flush()
+    @     0x55fd46bafd69  absl::logging_internal::LogMessageFatal::~LogMessageFatal()
+    @     0x55fd46b705f4  main
+    @     0x7fa3ec9f5bbd  __libc_start_main
+    @     0x55fd46b70469  _start
+END
+
+  CPP_ABSEIL_SIGFPE = <<END.freeze
+*** SIGFPE (@0x555a87aff520), received by PID 79264 (TID 79264) on cpu 11; stack trace: ***
+PC: @     0x555a87aff520  (unknown)  cpp_stack_trace/cpp_stack_trace.cc:14 main
+    @     0x555a87beed4b       1376  base/process_state.cc:1083 FailureSignalHandler()
+    @     0x7f5ffb1429a0  2037851744  (unknown)
+    @     0x7f5ffafb0bbd        208  __libc_start_main
+    @     0x555a87aff3a9  (unknown)  ../sysdeps/x86_64/start.S:108 _start
+END
+
+  CPP_ABSEIL_SIGFPE_NO_FILE_LINE = <<END.freeze
+*** SIGFPE (@0x55de188f7e20), received by PID 80538 (TID 80538) on cpu 2; stack trace: ***
+PC: @     0x55de188f7e20  (unknown)  main
+    @     0x55de1898d36b       1376  FailureSignalHandler()
+    @     0x7f3eb1e709a0  (unknown)  (unknown)
+    @     0x7f3eb1ce4bbd        208  __libc_start_main
+    @     0x55de188f7ca9  (unknown)  _start
+END
+
   ARBITRARY_TEXT = <<END.freeze
 This arbitrary text.
 It sounds tympanic: a word which means like a drum.
@@ -663,6 +703,13 @@ END
     check_exception(DART_NO_METHOD_GLOBAL_ERR, false)
     check_exception(DART_ASSERTION_ERR, false)
     check_exception(DART_ABSTRACT_CLASS_ERR, false)
+  end
+
+  def test_cpp
+    check_exception(CPP_ABSEIL_FATAL_ERR, false)
+    check_exception(CPP_ABSEIL_FATAL_ERR_NO_FILE_LINE, false)
+    check_exception(CPP_ABSEIL_SIGFPE, false)
+    check_exception(CPP_ABSEIL_SIGFPE_NO_FILE_LINE, false)
   end
 
   def test_mixed_languages

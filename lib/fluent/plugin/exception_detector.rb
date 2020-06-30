@@ -149,8 +149,23 @@ module Fluent
       rule(:dart_stack, /^<asynchronous suspension>$/, :dart_stack)
     ].freeze
 
+    CPP_RULES = [
+      rule(:start_state,
+           # assertion
+           /^\*\*\* Check failure stack trace: \*\*\*$/,
+           :cpp_stack),
+      rule(:start_state,
+           # signal handler
+           /^\*\*\* SIG... .*; stack trace: \*\*\*$/,
+           :cpp_stack),
+      # with and without file:line
+      rule(:cpp_stack, /^\s+@\s+0x[0-9a-f]+\s+.*$/, :cpp_stack),
+      rule(:cpp_stack, /^PC:\s+@\s+0x[0-9a-f]+\s+.*$/, :cpp_stack)
+    ].freeze
+
     ALL_RULES = (
-      JAVA_RULES + PYTHON_RULES + PHP_RULES + GO_RULES + RUBY_RULES + DART_RULES
+      JAVA_RULES + PYTHON_RULES + PHP_RULES + GO_RULES + RUBY_RULES +
+      DART_RULES + CPP_RULES
     ).freeze
 
     RULES_BY_LANG = {
@@ -165,6 +180,7 @@ module Fluent
       rb: RUBY_RULES,
       ruby: RUBY_RULES,
       dart: DART_RULES,
+      cpp: CPP_RULES,
       all: ALL_RULES
     }.freeze
 
